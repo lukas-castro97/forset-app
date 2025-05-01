@@ -1,50 +1,95 @@
-# Welcome to your Expo app 👋
+# 🏖️ Forset App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicativo mobile focado em **Beach Tennis Amador**, desenvolvido com **React Native + Expo**.  
+Criado para entregar uma experiência completa ao atleta, desde organização de jogos até tornei­­os.
 
-## Get started
+---
 
-1. Install dependencies
+## 🚀 Tecnologias Utilizadas
 
-   ```bash
-   npm install
-   ```
+- React Native + Expo
+- TypeScript
+- React Navigation
+- Async Storage
+- Axios
+- Xano (Backend)
+- SVG & PNG assets
+- Design System próprio
 
-2. Start the app
+---
 
-   ```bash
-    npx expo start
-   ```
+## 📱 Executando o App
 
-In the output, you'll find options to open the app in a
+### 1. Clone o projeto
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+git clone https://github.com/lukas-castro97/forset-app.git
+cd forset-app
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 2. Instale as dependências
 
-## Get a fresh project
+npm install
 
-When you're ready, run:
+## 3. Inicie o projeto no simulador ou dispositivo
+
+npx expo start
+
+---
+
+## 📁 Estrutura de Pastas
+
+src/
+├── components/         # Componentes reutilizáveis (botões, text fields, etc.)
+├── screens/            # Telas principais (Login, Onboarding, Home...)
+├── context/            # Contexto global de autenticação
+├── navigation/         # Navegação do app (stack)
+├── services/           # Serviços e chamadas de API
+├── theme/              # Design System: cores, tipografia, tamanhos
+
+---
+
+## 🌿 Git Flow (Fluxo de Branches)
+
+- main: sempre pronta para produção
+- develop: ambiente de integração
+- feature/nome: novas funcionalidades
+- fix/nome: correções de bugs
+- hotfix/nome: correção crítica em produção
+
+### Exemplo
+
+git checkout -b feature/onboarding
+- desenvolve...
+git add .
+git commit -m "feat: cria onboarding"
+git push origin feature/onboarding
+
+--- 
+
+### Arquivos ignorados
+
+- node_modules/
+- .expo/
+- .expo-shared/
+- ios/build/
+- android/app/build/
+- *.log
+- .env
+- .vscode/
+- .DS_Store
+
+
+---
+
+# Autor
+
+Lukas Castro
+💼 Product Designer | 💻 React Native Developer
+🔗 linkedin.com/in/lukas-castro
+
+---
+
+### 📜 Licença
+
+Este projeto está licenciado sob a Licença MIT.
 
 ```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.

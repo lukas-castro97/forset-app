@@ -19,13 +19,9 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
-  const { isAuthenticated, token, user, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
-  // Enquanto ainda está validando o token inicial
   if (loading) return <SplashScreen />;
-
-  // Se tiver token, mas não carregou o usuário ainda (ex: timeout da API)
-  if (token && !user) return <SplashScreen />;
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

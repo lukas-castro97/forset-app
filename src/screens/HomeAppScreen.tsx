@@ -1,12 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import colors from '../theme/colors';
 import typography from '../theme/typography';
+import PrimaryButton from '../components/PrimaryButton';
 
 export default function HomeAppScreen() {
-  const { user, loadingUser, refreshUser } = useAuth();
-  const hasFetched = useRef(false); // 👈 flag persistente
+  const { user, loadingUser, refreshUser, logout } = useAuth();
+  const hasFetched = useRef(false);
 
   useEffect(() => {
     if (!hasFetched.current) {
@@ -18,7 +19,6 @@ export default function HomeAppScreen() {
   if (loadingUser) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color={colors.brand.primary.main} />
         <Text style={styles.loadingText}>Carregando dados do usuário...</Text>
       </View>
     );
@@ -28,6 +28,12 @@ export default function HomeAppScreen() {
     return (
       <View style={styles.container}>
         <Text style={styles.errorText}>Erro ao carregar os dados do usuário.</Text>
+        <View style={styles.buttonWrapper}>
+          <PrimaryButton title="Tentar novamente" onPress={refreshUser} />
+        </View>
+        <View style={styles.buttonWrapper}>
+          <PrimaryButton title="Sair da conta" onPress={logout} />
+        </View>
       </View>
     );
   }
@@ -40,6 +46,9 @@ export default function HomeAppScreen() {
       <Text style={styles.categoryText}>
         Categoria editável: {user.category_edit ? 'Sim' : 'Não'}
       </Text>
+      <View style={styles.buttonWrapper}>
+        <PrimaryButton title="Sair da conta" onPress={logout} />
+      </View>
     </View>
   );
 }
@@ -70,5 +79,11 @@ const styles = StyleSheet.create({
   errorText: {
     ...typography.body.p14Regular,
     color: colors.feedback.error.main,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  buttonWrapper: {
+    marginTop: 12,
+    width: '100%',
   },
 });

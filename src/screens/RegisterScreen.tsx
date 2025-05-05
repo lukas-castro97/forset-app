@@ -8,6 +8,7 @@ import {
   Pressable,
   Keyboard,
   TouchableWithoutFeedback,
+  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -52,12 +53,14 @@ export default function RegisterScreen() {
   };
 
   const handleRegister = async () => {
+    if (loading) return;
+
     validateEmail();
     validateCPF();
     validatePasswordMatch();
 
     if (!name || !email || !cpf || !password || !confirmPassword) {
-      alert('Preencha todos os campos.');
+      Alert.alert('Preenchimento obrigatório', 'Preencha todos os campos.');
       return;
     }
 
@@ -65,24 +68,23 @@ export default function RegisterScreen() {
 
     try {
       setLoading(true);
-      const response = await axios.post('https://x8ki-letl-twmt.n7.xano.io/api:W6SexkSR/auth/signup', {
-        name,
-        email,
-        password,
-        cpf,
-      });
+      const response = await axios.post(
+        'https://x8ki-letl-twmt.n7.xano.io/api:W6SexkSR/auth/signup',
+        { name, email, password, cpf }
+      );
 
-      const { token, code } = response.data;
+      const { token, code, id } = response.data;
 
-      await AsyncStorage.setItem('@token', token);
-
-      navigation.navigate('Verify', {
-        email,
-        code: String(code),
-      });
+      if (token && code && id) {
+        await AsyncStorage.setItem('@token', token);
+        await AsyncStorage.setItem('@user_id', String(id)); // 👈 ESSENCIAL
+        navigation.navigate('Verify', { email, code: String(code) });
+      } else {
+        Alert.alert('Erro', 'Não foi possível concluir o cadastro. Tente novamente.');
+      }
     } catch (err) {
-      console.error('Erro no cadastro:', err);
-      alert('Erro ao criar conta.');
+      console.error('❌ Erro no cadastro:', err);
+      Alert.alert('Erro', 'Falha ao criar conta. Verifique os dados ou tente mais tarde.');
     } finally {
       setLoading(false);
     }
@@ -120,7 +122,10 @@ export default function RegisterScreen() {
           required
           keyboardType="email-address"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text) => {
+            setEmail(text);
+            setEmailError('');
+          }}
           onBlur={validateEmail}
           error={emailError}
         />
@@ -137,6 +142,7 @@ export default function RegisterScreen() {
               .replace(/(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
               .replace(/(\d{3})\.(\d{3})\.(\d{3})(\d{1,2})$/, '$1.$2.$3-$4');
             setCpf(masked);
+            setCpfError('');
           }}
           onBlur={validateCPF}
           error={cpfError}
@@ -155,13 +161,30 @@ export default function RegisterScreen() {
           secureTextEntry
           required
           value={confirmPassword}
-          onChangeText={setConfirmPassword}
+          onChangeText={(text) => {
+            setConfirmPassword(text);
+            setConfirmPasswordError('');
+          }}
           onBlur={validatePasswordMatch}
           error={confirmPasswordError}
         />
 
         <View style={styles.footer}>
-          <PrimaryButton title="Criar minha conta" onPress={handleRegister} loading={loading} />
+          <PrimaryButton
+            title="Criar minha conta"
+            onPress={handleRegister}
+            loading={loading}
+            disabled={
+              !name ||
+              !email ||
+              !cpf ||
+              !password ||
+              !confirmPassword ||
+              !!emailError ||
+              !!cpfError ||
+              !!confirmPasswordError
+            }
+          />
         </View>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>

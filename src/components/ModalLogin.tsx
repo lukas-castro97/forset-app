@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Modal, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import colors from '../theme/colors';
 import typography from '../theme/typography';
-import sizeSystem from '../theme/sizeSystem';
 import TextField from './TextField';
 import PrimaryButton from './PrimaryButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -31,9 +30,9 @@ export default function ModalLogin({ visible, onClose }: ModalLoginProps) {
     }
   };
 
-  async function handleLogin() {
-    if (!email || emailError) return;
-  
+  const handleLogin = async () => {
+    if (!email || emailError || !password || loading) return;
+
     setLoading(true);
     try {
       const response = await fetch('https://x8ki-letl-twmt.n7.xano.io/api:W6SexkSR/auth/login', {
@@ -41,80 +40,90 @@ export default function ModalLogin({ visible, onClose }: ModalLoginProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-  
+
       const data = await response.json();
-      console.log('Resposta login Xano:', data); // 🐞 debug
-  
+      console.log('🔐 Resposta login Xano:', data);
+
       const token = data?.authToken || data?.token;
       const userId = data?.id;
-  
+
       if (response.ok && token && userId) {
         await AsyncStorage.setItem('@user_id', String(userId));
         await AsyncStorage.setItem('@token', token);
-        await authLogin(token); // só depois de salvar ambos
+        await authLogin(token);
         onClose();
+
+        // Limpa campos após sucesso
+        setEmail('');
+        setPassword('');
+        setEmailError('');
       } else {
         setEmailError(`Erro: ${data?.message || 'Login inválido'}`);
       }
-    } catch (error: any) {
-      setEmailError('Erro: Não foi possível conectar. Tente novamente.');
-      console.error('Erro no login:', error);
+    } catch (error) {
+      console.error('❌ Erro no login:', error);
+      setEmailError('Erro de conexão. Tente novamente.');
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      transparent
-      onRequestClose={onClose}
-    >
-      <Pressable style={styles.overlay} onPress={onClose}>
-        <Pressable style={styles.container} onPress={() => {}}>
-          <View style={styles.dragger} />
+    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.overlay}
+      >
+        <Pressable style={styles.overlay} onPress={onClose}>
+          <Pressable style={styles.container} onPress={() => {}}>
+            <View style={styles.dragger} />
 
-          <Text style={styles.title}>Boas-vindas de volta!</Text>
-          <Text style={styles.subtitle}>
-            Prepare sua raquete e bora pro play! Faça login para continuar melhorando no seu jogo.
-          </Text>
+            <Text style={styles.title}>Boas-vindas de volta!</Text>
+            <Text style={styles.subtitle}>
+              Prepare sua raquete e bora pro play! Faça login para continuar melhorando no seu jogo.
+            </Text>
 
-          <View style={styles.fields}>
-            <TextField
-              label="E-mail"
-              placeholder="Digite seu e-mail"
-              keyboardType="email-address"
-              required
-              value={email}
-              onChangeText={(text) => setEmail(text)}
-              onBlur={() => validateEmail(email)}
-              error={!!emailError}
-              caption={emailError}
-              autoCapitalize="none"
+            <View style={styles.fields}>
+              <TextField
+                label="E-mail"
+                placeholder="Digite seu e-mail"
+                keyboardType="email-address"
+                required
+                value={email}
+                onChangeText={(text) => setEmail(text)}
+                onBlur={() => validateEmail(email)}
+                error={!!emailError}
+                caption={emailError}
+                autoCapitalize="none"
+              />
+              <TextField
+                label="Senha"
+                placeholder="********"
+                secureTextEntry={!passwordVisible}
+                required
+                value={password}
+                onChangeText={setPassword}
+                rightIcon={passwordVisible ? 'eye-off' : 'eye'}
+                onPressRightIcon={() => setPasswordVisible((prev) => !prev)}
+              />
+            </View>
+
+            <PrimaryButton
+              title="Acessar minha conta"
+              onPress={handleLogin}
+              loading={loading}
+              disabled={!email || !password || !!emailError}
             />
-            <TextField
-              label="Senha"
-              placeholder="********"
-              secureTextEntry={!passwordVisible}
-              required
-              value={password}
-              onChangeText={setPassword}
-              rightIcon={passwordVisible ? 'eye-off' : 'eye'}
-              onPressRightIcon={() => setPasswordVisible((prev) => !prev)}
-            />
-          </View>
 
-          <PrimaryButton title="Acessar minha conta" onPress={handleLogin} loading={loading} />
-
-          <Pressable>
-            <Text style={styles.link}>Esqueci minha senha</Text>
-          </Pressable>
-          <Pressable>
-            <Text style={styles.linkAlt}>Novo por aqui? / Vem criar sua conta</Text>
+            <Pressable>
+              <Text style={styles.link}>Esqueci minha senha</Text>
+            </Pressable>
+            <Pressable>
+              <Text style={styles.linkAlt}>Novo por aqui? / Vem criar sua conta</Text>
+            </Pressable>
           </Pressable>
         </Pressable>
-      </Pressable>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

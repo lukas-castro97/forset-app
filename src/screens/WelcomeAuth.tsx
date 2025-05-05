@@ -7,13 +7,15 @@ import AuthHome from '../../assets/images/AuthHome.svg';
 import Logo from '../../assets/images/splash/logo-name.svg';
 import Constants from 'expo-constants';
 import ModalLogin from '../components/ModalLogin';
-import ModalAccountNew from '../components/ModalAccountNew';
+import { useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
+import type { RootStackParamList } from '../navigation/types';
 
 const { width } = Dimensions.get('window');
 
 export default function WelcomeAuthScreen() {
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [showLogin, setShowLogin] = useState(false);
-  const [showAccount, setShowAccount] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -35,13 +37,16 @@ export default function WelcomeAuthScreen() {
           <View style={styles.line} />
         </View>
 
-        <PrimaryButton title="Criar minha conta" variant="ghost" onPress={() => setShowAccount(true)} />
+        <PrimaryButton
+          title="Criar minha conta"
+          variant="ghost"
+          onPress={() => navigation.navigate('Register')}
+        />
       </View>
 
       <Text style={styles.version}>Versão {Constants.expoConfig?.version}</Text>
 
       <ModalLogin visible={showLogin} onClose={() => setShowLogin(false)} />
-      <ModalAccountNew visible={showAccount} onClose={() => setShowAccount(false)} />
     </View>
   );
 }

@@ -6,7 +6,6 @@ import typography from '../theme/typography';
 import sizeSystem from '../theme/sizeSystem';
 import TextField from './TextField';
 import PrimaryButton from './PrimaryButton';
-import { login } from '../services/auth'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ModalLoginProps {
@@ -20,6 +19,7 @@ export default function ModalLogin({ visible, onClose }: ModalLoginProps) {
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const { login: authLogin } = useAuth();
 
   const validateEmail = (value: string) => {
@@ -33,16 +33,28 @@ export default function ModalLogin({ visible, onClose }: ModalLoginProps) {
 
   async function handleLogin() {
     if (!email || emailError) return;
-
+  
     setLoading(true);
     try {
-      const result = await login(email, password);
-
-      if (result.success) {
-        authLogin(); // Marca usuário como autenticado
-        onClose();   // Fecha o modal
+      const response = await fetch('https://x8ki-letl-twmt.n7.xano.io/api:W6SexkSR/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+  
+      const data = await response.json();
+      console.log('Resposta login Xano:', data); // 🐞 debug
+  
+      const token = data?.authToken || data?.token;
+      const userId = data?.id;
+  
+      if (response.ok && token && userId) {
+        await AsyncStorage.setItem('@user_id', String(userId));
+        await AsyncStorage.setItem('@token', token);
+        await authLogin(token); // só depois de salvar ambos
+        onClose();
       } else {
-        setEmailError(`Erro: ${result.message}`);
+        setEmailError(`Erro: ${data?.message || 'Login inválido'}`);
       }
     } catch (error: any) {
       setEmailError('Erro: Não foi possível conectar. Tente novamente.');
@@ -63,22 +75,24 @@ export default function ModalLogin({ visible, onClose }: ModalLoginProps) {
         <Pressable style={styles.container} onPress={() => {}}>
           <View style={styles.dragger} />
 
-          <Text style={styles.title}>Login</Text>
-          <Text style={styles.subtitle}>Seja bem vindo de volta! bora pro PLAY!</Text>
+          <Text style={styles.title}>Boas-vindas de volta!</Text>
+          <Text style={styles.subtitle}>
+            Prepare sua raquete e bora pro play! Faça login para continuar melhorando no seu jogo.
+          </Text>
 
           <View style={styles.fields}>
             <TextField
-                label="E-mail"
-                placeholder="Digite seu e-mail"
-                keyboardType="email-address"
-                required
-                value={email}
-                onChangeText={(text) => setEmail(text)}
-                onBlur={() => validateEmail(email)}
-                error={!!emailError}
-                caption={emailError}
-                autoCapitalize="none"
-              />
+              label="E-mail"
+              placeholder="Digite seu e-mail"
+              keyboardType="email-address"
+              required
+              value={email}
+              onChangeText={(text) => setEmail(text)}
+              onBlur={() => validateEmail(email)}
+              error={!!emailError}
+              caption={emailError}
+              autoCapitalize="none"
+            />
             <TextField
               label="Senha"
               placeholder="********"
@@ -117,7 +131,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 18,
     borderTopLeftRadius: 18,
   },
-
   dragger: {
     alignSelf: 'center',
     width: 48,

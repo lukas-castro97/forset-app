@@ -7,37 +7,44 @@ import sizeSystem from '../theme/sizeSystem';
 interface PrimaryButtonProps {
   title: string;
   onPress: () => void;
-  variant?: 'default' | 'secondary' | 'ghost';
+  variant?: 'default' | 'secondary' | 'ghost' | 'flat';
   loading?: boolean;
   disabled?: boolean;
 }
 
-export default function PrimaryButton({ title, onPress, variant = 'default', loading = false, disabled = false }: PrimaryButtonProps) {
+export default function PrimaryButton({
+  title,
+  onPress,
+  variant = 'default',
+  loading = false,
+  disabled = false,
+}: PrimaryButtonProps) {
+  const isDisabled = loading || disabled;
+
   return (
     <TouchableOpacity
-      onPress={!loading ? onPress : undefined}
+      onPress={!isDisabled ? onPress : undefined}
       activeOpacity={0.8}
-      disabled={disabled || loading}
+      disabled={isDisabled}
       style={[
         styles.buttonBase,
         variant === 'secondary' && styles.buttonSecondary,
         variant === 'ghost' && styles.buttonGhost,
-        (disabled || loading) && { opacity: 0.5 },
+        variant === 'flat' && styles.buttonFlat,
+        isDisabled && styles.buttonDisabled,
       ]}
     >
-      {loading ? (
-        <Text style={styles.textBase}>Carregando...</Text>
-      ) : (
-        <Text
-          style={[
-            styles.textBase,
-            variant === 'secondary' && styles.textSecondary,
-            variant === 'ghost' && styles.textGhost,
-          ]}
-        >
-          {title}
-        </Text>
-      )}
+      <Text
+        style={[
+          styles.textBase,
+          variant === 'secondary' && styles.textSecondary,
+          variant === 'ghost' && styles.textGhost,
+          variant === 'flat' && styles.textFlat,
+          isDisabled && styles.textDisabled,
+        ]}
+      >
+        {loading ? 'Carregando...' : title}
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -59,6 +66,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.text.alwaysWhite,
   },
+  buttonFlat: {
+    backgroundColor: colors.brand.primary.extraLight,
+  },
+  buttonDisabled: {
+    backgroundColor: colors.neutral[200],
+  },
   textBase: {
     color: colors.text.alwaysWhite,
     ...typography.title.h6SemiBold,
@@ -68,5 +81,11 @@ const styles = StyleSheet.create({
   },
   textGhost: {
     color: colors.text.alwaysWhite,
+  },
+  textFlat: {
+    color: colors.text.textPrimaryMain,
+  },
+  textDisabled: {
+    color: colors.neutral[500],
   },
 });

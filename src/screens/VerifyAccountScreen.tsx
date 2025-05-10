@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -17,10 +17,12 @@ import type { RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '../navigation/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../context/AuthContext';
-import { useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 
 export default function VerifyAccountScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'Verify'>>();
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const expectedCode = route.params.code;
 
   const { login } = useAuth();
@@ -28,6 +30,13 @@ export default function VerifyAccountScreen() {
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
   const inputs = useRef<(TextInput | null)[]>([]);
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const handleChange = (text: string, index: number) => {
     if (/\d/.test(text) || text === '') {
@@ -55,7 +64,13 @@ export default function VerifyAccountScreen() {
         return;
       }
 
-      await login(token); // redirecionamento via AppNavigator (isAuthenticated)
+      await login(token);
+
+      if (isMounted.current) {
+        setTimeout(() => {
+          navigation.navigate('HomeApp');
+        }, 0);
+      }
     } catch (err) {
       console.error('Erro no login:', err);
       setError('Erro ao autenticar. Verifique o código e tente novamente.');
@@ -69,7 +84,7 @@ export default function VerifyAccountScreen() {
     >
       <View style={styles.header}>
         <ForsetIcon width={32} height={32} />
-        <Pressable onPress={() => {}}>
+        <Pressable onPress={() => navigation.goBack()}>
           <Icon name="x" size={24} color={colors.feedback.error.main} />
         </Pressable>
       </View>

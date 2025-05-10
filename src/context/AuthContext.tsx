@@ -54,9 +54,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('✅ RESPOSTA /me:', response.data);
       setUser(response.data);
     } catch (error: any) {
+      const status = error?.response?.status;
       console.error('❌ ERRO ao buscar usuário:', error);
-      Alert.alert('Erro', 'Não foi possível carregar os dados do usuário.');
-      await logout();
+
+      if (status === 429) {
+        Alert.alert(
+          'Erro de limite',
+          'Muitas requisições. Aguarde alguns segundos e tente novamente.'
+        );
+        // não faz logout
+      } else {
+        Alert.alert('Erro', 'Não foi possível carregar os dados do usuário.');
+        await logout();
+      }
     } finally {
       setLoadingUser(false);
     }
@@ -69,7 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (receivedToken: string) => {
     await saveToken(receivedToken);
     setToken(receivedToken);
-    await fetchUserData(receivedToken); // ✅ busca usuário logo após login
+    await fetchUserData(receivedToken);
   };
 
   const logout = async () => {
@@ -81,12 +91,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const initializeAuth = async () => {
     const storedToken = await getToken();
-    if (storedToken) {
+    const storedUserId = await AsyncStorage.getItem('@user_id');
+
+    if (storedToken && storedUserId) {
+      console.log('🔐 Recuperado token e ID:', storedToken, storedUserId);
       setToken(storedToken);
-      await fetchUserData(storedToken);
+      fetchUserData(storedToken);
+    } else {
+      setLoadingUser(false);
     }
+
     setHasTriedInit(true);
-    setLoadingUser(false);
   };
 
   useEffect(() => {

@@ -4,17 +4,12 @@ import SplashScreen from '../screens/splashScreen';
 import { useAuth } from '../context/AuthContext';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import WelcomeAuthScreen from '../screens/WelcomeAuth';
-import HomeAppScreen from '../screens/HomeAppScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import VerifyAccountScreen from '../screens/VerifyAccountScreen';
-
-export type RootStackParamList = {
-  Onboarding: undefined;
-  WelcomeAuth: undefined;
-  Register: undefined;
-  HomeApp: undefined;
-  Verify: undefined;
-};
+import NivelamentoQuizScreen from '../screens/NivelamentoQuizScreen';
+import SuccessNivelamentoScreen from '../screens/SuccessNivelamentoScreen';
+import TabNavigator from './TabNavigator';
+import type { RootStackParamList } from './types'; // ✅ AQUI
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -26,7 +21,11 @@ export default function AppNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {isAuthenticated ? (
-        <Stack.Screen name="HomeApp" component={HomeAppScreen} />
+        <>
+          <Stack.Screen name="HomeApp" component={TabNavigator} />
+          <Stack.Screen name="NivelamentoQuiz" component={NivelamentoQuizScreen} />
+          <Stack.Screen name="SuccessNivelamento" component={SuccessNivelamentoScreen} />
+        </>
       ) : (
         <>
           <Stack.Screen name="Onboarding" component={OnboardingScreen} />

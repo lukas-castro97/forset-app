@@ -9,9 +9,10 @@ import BannerImage from '../../assets/images/banner-nivelamento.svg';
 
 interface HomeHeaderBlockProps {
   onPressBanner?: () => void;
+  onPressMenu?: () => void; // 👈 nova prop
 }
 
-export default function HomeHeaderBlock({ onPressBanner }: HomeHeaderBlockProps) {
+export default function HomeHeaderBlock({ onPressBanner, onPressMenu }: HomeHeaderBlockProps) {
   const { user } = useAuth();
 
   const getInitials = (fullName: string) => {
@@ -44,7 +45,7 @@ export default function HomeHeaderBlock({ onPressBanner }: HomeHeaderBlockProps)
           <TouchableOpacity style={styles.iconButton}>
             <Icon name="bell" size={18} color={colors.neutral[400]} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
+          <TouchableOpacity style={styles.iconButton} onPress={onPressMenu}>
             <Icon name="menu" size={18} color={colors.neutral[400]} />
           </TouchableOpacity>
         </View>

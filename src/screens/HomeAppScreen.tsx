@@ -15,6 +15,7 @@ import HomeHeader from '../components/HomeHeaderBlock';
 import QuickAccess from '../components/QuickAccess';
 import RankingCard from '../components/RankingCards';
 import NivelamentoModal from '../components/NivelamentoModal';
+import AlertBlock from '../components/AlertBox';
 
 export default function HomeAppScreen() {
   const { user, loadingUser, refreshUser, logout } = useAuth();
@@ -64,14 +65,13 @@ export default function HomeAppScreen() {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.emptyStateBox}>
-        <Text style={styles.emptyStateIcon}>❗</Text>
-        <View>
-          <Text style={styles.emptyStateTitle}>Sem partidas registradas!</Text>
-          <Text style={styles.emptyStateText}>
-            Parece que você ainda não jogou nenhuma partida ou participou de campeonatos. Para ser ranqueado com precisão, registre suas partidas e participe de torneios. Isso ajudará o sistema a nivelar você corretamente!
-          </Text>
-        </View>
+      <View style={{ marginHorizontal: 24, marginTop: 24 }}>
+        <AlertBlock
+          type="neutral"
+          showIcon
+          title="Sem partidas registradas!"
+          message="Parece que você ainda não jogou nenhuma partida ou participou de campeonatos. Para ser ranqueado com precisão, registre suas partidas e participe de torneios. Isso ajudará o sistema a nivelar você corretamente!"
+        />
       </View>
 
       <View style={styles.buttonWrapper}>
@@ -132,27 +132,5 @@ const styles = StyleSheet.create({
   sectionLink: {
     ...typography.body.p14SemiBold,
     color: colors.brand.primary.main,
-  },
-  emptyStateBox: {
-    backgroundColor: colors.background.elevate,
-    marginHorizontal: 24,
-    padding: 16,
-    borderRadius: 12,
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 12,
-  },
-  emptyStateIcon: {
-    fontSize: 18,
-    marginTop: 4,
-  },
-  emptyStateTitle: {
-    ...typography.title.h6SemiBold,
-    color: colors.text.title,
-    marginBottom: 4,
-  },
-  emptyStateText: {
-    ...typography.body.p14Regular,
-    color: colors.text.body,
   },
 });

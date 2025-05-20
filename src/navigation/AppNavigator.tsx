@@ -9,7 +9,8 @@ import VerifyAccountScreen from '../screens/VerifyAccountScreen';
 import NivelamentoQuizScreen from '../screens/NivelamentoQuizScreen';
 import SuccessNivelamentoScreen from '../screens/SuccessNivelamentoScreen';
 import TabNavigator from './TabNavigator';
-import type { RootStackParamList } from './types'; // ✅ AQUI
+import MenuScreen from '../screens/MenuScreen';
+import type { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -25,6 +26,8 @@ export default function AppNavigator() {
           <Stack.Screen name="HomeApp" component={TabNavigator} />
           <Stack.Screen name="NivelamentoQuiz" component={NivelamentoQuizScreen} />
           <Stack.Screen name="SuccessNivelamento" component={SuccessNivelamentoScreen} />
+          <Stack.Screen name="Menu" component={MenuScreen} /> 
+
         </>
       ) : (
         <>
